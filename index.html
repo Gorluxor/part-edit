@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <!-- Primary description for search engines -->
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <!-- If you have a canonical URL (e.g., your GitHub Pages URL), add it here -->
+  <meta property="og:url" content="https://partedit.github.io/PartEdit/" />
+  <meta property="og:title" content="PartEdit: Fine-Grained Image Editing using Pre-Trained Diffusion Models" />
+  
+  <meta name="description" content="PartEdit, enables a wide range of fine-grained edits with seamless integration and high visual quality. We propose a novel blending strategy based on each timestep in each layer, using non-binary masks obtained from optimized tokens (in a low data setting). We demonstrate the effectiveness of our framework on a custom build benchmark, PartEdit-Synth, and PartEdit-Real, comparing against three groups of methods.">
+  <meta property="og:description" content="PartEdit, enables a wide range of fine-grained edits with seamless integration and high visual quality. We propose a novel blending strategy based on each timestep in each layer, using non-binary masks obtained from optimized tokens (in a low data setting). We demonstrate the effectiveness of our framework on a custom build benchmark, PartEdit-Synth, and PartEdit-Real, comparing against three groups of methods." />
+  <meta name="twitter:description" content="PartEdit, enables a wide range of fine-grained edits with seamless integration and high visual quality. We propose a novel blending strategy based on each timestep in each layer, using non-binary masks obtained from optimized tokens (in a low data setting). We demonstrate the effectiveness of our framework on a custom build benchmark, PartEdit-Synth, and PartEdit-Real, comparing against three groups of methods.">
+  <!-- Path to your desired social share image -->
+  <meta property="og:image" content="static/figures/teaser.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <!-- If you have a canonical URL, add it here as well -->
+  <meta name="twitter:url" content="https://partedit.github.io/PartEdit/" />
+  <meta name="twitter:title" content="PartEdit: Fine-Grained Image Editing using Pre-Trained Diffusion Models">
+  <meta name="twitter:image" content="static/figures/teaser.png">
+
+  <!-- Keywords for SEO -->
+  <meta name="keywords" content="image editing, diffusion models, fine-grained image editing, PartEdit">
+
+  <!-- Everything else: fonts, CSS, JS, etc. -->
+  <title>PartEdit: Fine-Grained Image Editing using Pre-Trained Diffusion Models</title>
+  <link rel="icon" type="image/x-icon" href="static/images/favicon.ico">
+  <link rel="apple-touch-icon" sizes="180x180" href="static/favicons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="static/favicons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="static/favicons/favicon-16x16.png">
+  <link rel="manifest" href="static/favicons/site.webmanifest">
+
+
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
+  <link rel="stylesheet" href="static/css/bulma.min.css">
+  <link rel="stylesheet" href="static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="static/css/fontawesome.all.min.css">
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="static/css/index.css">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://documentcloud.adobe.com/view-sdk/main.js"></script>
+  <script defer src="static/js/fontawesome.all.min.js"></script>
+  <script src="static/js/bulma-carousel.min.js"></script>
+  <script src="static/js/bulma-slider.min.js"></script>
+  <script src="static/js/index.js"></script>
+
+  <style>
+    /* Additional style tweaks (optional) */
+    .publication-title {
+      font-size: 3.0rem;
+      font-weight: bold;
+    }
+    .publication-subtitle {
+      font-size: 2.7rem;
+    }
+    .publication-authors {
+      font-size: 1rem;
+    }
+    .content li,
+    .content p {
+      font-size: 1.5rem;
+      line-height: 1.5;
+    }
+    .content h2 {
+      font-size: 3rem;
+      line-height: 1.5;
+    }
+    /* .is-3 p {
+      font-size: 1.5em;
+      line-height: 1.5;
+    } */
+    
+    .hero.teaser img {
+      max-width: 100%;
+      height: auto;
+    }
+
+    /* You can copy over any additional custom styles from your second file if needed */
+    .title-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+    }
+    .title-logo {
+      height: 3rem;
+      width: 3rem;
+    }
+    .list-container {
+      display: flex;
+      justify-content: center;
+    }
+    .ordered-list {
+      text-align: left;
+      list-style-position: inside;
+    }
+    .note {
+      font-size: 1.4rem;
+      /* font-weight: ; */
+      text-align: center;
+    }
+    /* Header container */
+    .header-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+    .header-container img {
+        height: 4rem;
+        width: 4rem;
+    }
+    .make-black {
+            background-color: #f5f5f5;
+            color: rgba(0, 0, 0, 0.7);
+        }
+  </style>
+</head>
+
+<body>
+
+<!-- ======================= Hero ======================= -->
+<section class="hero">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          
+          <!-- <div style="display: flex; align-items: center; justify-content: center; gap: 10px;"> -->
+            <img src="static/favicons/android-chrome-192x192.png" alt="Logo"
+                 style="height: 192px; width: 192px;">
+
+          <h1 class="title is-1 publication-title" style="font-size: 44px;">
+            PartEdit
+          </h1>
+          <h2 class="title is-2 publication-title">
+            Fine-Grained Image Editing using Pre-Trained Diffusion Models
+          </h2>
+          <h2 class="title is-2 publication-title">
+            
+          </h2>
+          <div class="is-size-5 publication-authors">
+            <!-- <span class="author-block">
+              <a href="#" target="_blank"></a>*,
+            </span> -->
+            <!-- <span class="author-block">
+              <a href="#" target="_blank"></a>*,
+            </span> -->
+            <!-- <span class="author-block">
+              <a href="#" target="_blank"></a>
+            </span> -->
+          </div>
+          <!-- <div class="is-size-5 publication-authors">
+            <span class="author-block">University of TODO</span>
+          </div> -->
+          <!-- <p class="is-size-7">
+            *Denotes equal contribution
+          </p> -->
+          <div class="is-size-5 publication-authors">
+            <!-- <span class="author-block">conference</span> -->
+          </div>
+
+          <!-- Links (arXiv, code, demo) -->
+          <div class="publication-links" style="margin-top:1rem;">
+            <span class="link-block">
+              <!-- TODO: add href -->
+                <a href="https://arxiv.org/abs/2502.04050" 
+                 class="button is-normal is-rounded is-dark" 
+                 target="_blank">
+                <span class="icon"><i class="ai ai-arxiv"></i></span>
+                <span>arXiv (paper)</span>
+              </a>
+            </span>
+            <span class="link-block">
+                <!-- TODO: add href -->
+              <a href="#" 
+                 class="button is-normal is-rounded is-dark" 
+                 target="_blank">
+                <span class="icon"><i class="fab fa-github"></i></span>
+                <span>Code (coming soon)</span>
+              </a>
+            </span>
+            <span class="link-block">
+                <!-- TODO: add href -->
+              <a href="#" 
+                 class="button is-normal is-rounded is-dark" 
+                 target="_blank">
+                🤗
+                <!-- <span class="icon"><i class="fas fa-edit"></i></span> -->
+                <!-- <span class="icon"><i class="fas fa-huggingface"></i></span> -->
+                <span>Demo (coming soon)</span>
+              </a>
+            </span>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= Teaser Image ======================= -->
+
+
+<!-- <section class="hero teaser is-small">
+  <div class="hero-body">
+    <div class="columns is-centered">
+      <div class="column is-8">
+        <img src="static/figures/teaser.png" alt="PartEdit Teaser">
+        <h2 class="caption is-size-5 subtitle has-text-centered" style="margin-top:1rem;">
+            Our approach, PartEdit, enables a wide range of fine-grained edits, allowing users to 
+            create highly customizable changes. The edits are seamless, precisely localized, 
+            and of high visual quality with no leakage into unedited regions.
+        </h2>
+      </div>
+    </div>
+  </div>
+</section> -->
+
+
+  <section class="section">
+    <div class="container">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-full">
+            <div class="is-3">
+                <img src="static/figures/teaser.png" alt="PartEdit Teaser">
+                <h2 class="caption is-size-5 subtitle has-text-centered" style="margin-top:1rem;">
+                    Our approach, PartEdit, enables a wide range of fine-grained edits, allowing users to 
+                    create highly customizable changes. The edits are seamless, precisely localized, 
+                    and of high visual quality with no leakage into unedited regions.
+                </h2>
+            </div>
+          
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+<!-- ======================= Abstract ======================= -->
+<section class="section make-black">
+  <div class="container">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-8">
+        <h2 class="title is-2">Abstract</h2>
+        <div class="content has-text-justified">
+            <p>
+                We present the first <em>text-based</em> image editing approach for <em>object parts</em> based on pre-trained diffusion models.
+                Diffusion-based image editing approaches capitalize on the deep understanding of diffusion models of image semantics to perform a variety of edits.
+                However, existing diffusion models lack sufficient understanding of many object parts, hindering fine-grained edits requested by users.
+                To address this, we propose to expand the knowledge of pre-trained diffusion models to allow them to understand various object parts, enabling them to perform fine-grained edits.
+                We achieve this by learning special textual tokens that correspond to different object parts through an efficient token optimization process.
+                These tokens are optimized to produce reliable localization masks <em>at each inference step</em> to localize the editing region.
+                Leveraging these masks, we design feature-blending and adaptive thresholding strategies to execute the edits seamlessly.
+                To evaluate our approach, we establish a benchmark and an evaluation protocol for part editing.
+                Experiments show that our approach outperforms existing editing methods on all metrics and is preferred by users 77-90% of the time in conducted user studies.
+            </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= Video Section ======================= -->
+<!-- <section class="section">
+  <div class="container">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-7">
+        <video id="AGI-demo" controls width="100%" autoplay muted>
+          <source src="#" type="video/mp4">
+        </video>
+        <p style="margin-top: 1rem;">
+          TEXT
+        </p>
+      </div>
+    </div>
+  </div>
+</section> -->
+
+<!-- ======================= PartEdit Explanation / Summary ======================= -->
+
+<section class="section">
+  <div class="container">
+      
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-full">
+          <div class="header-container">
+            <img src="static/favicons/android-chrome-192x192.png" alt="Logo">
+            <h2 class="publication-title">PartEdit</h2>
+          </div>
+          <img src="static/figures/method.png" alt="Method figure">
+          <h2 class="caption is-size-5 subtitle has-text-centered" style="margin-top:1rem;">
+            Overview of our proposed fine-grained part editing approach. The pipeline consists of two main steps: (1) learning part tokens by optimizing on a small set of images, and (2) using these tokens for novel non-binary blending within UNet layers at inference time.
+          </h2>
+
+
+        </div>
+      </div>
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-8">
+            
+            <div class="content has-text-justified ordered-list">
+                <p>
+                  We present PartEdit, a Fine-Grained image editing framework for existing pre-trained UNet-based diffusion models. Our contribution is in two folds:
+                </p>
+                <ol type="1">
+                    <li>
+                      We propose a novel blending strategy based on each timestep in each layer, using non-binary masks obtained from optimized tokens (in a low data setting).
+                    </li>
+                    <li>
+                      We demonstrate the effectiveness of our framework on a custom build benchmark, PartEdit-Synth, and PartEdit-Real, comparing against three groups of methods.
+                    </li>
+                </ol>
+                <p class="note">
+                  As our method does not change the underlying model, we preserve existing capabilities. We showcase one such integration with existing inversion techniques.
+                </p>
+            </div>
+            
+
+        </div>
+        
+    </div>
+  </div>
+</section>
+
+
+
+<!-- ======================= PartEdit Synthetic Image Editing Results ======================= -->
+  <section class="section make-black">
+    <div class="container">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-full">
+            <div class="content is-3">
+                <h2 class="title">Synthetic Image Editing Results</h2>
+                <p>Below is another slider demonstrating PartEdit results on synthetic images:</p>      
+            </div>
+        
+        
+            <div id="synthetic-carousel" class="carousel results-carousel">
+        
+              <div class="carousel-item">
+                <img src="static/images/synth/1.jpg" alt="Image 1">
+              </div>
+              <div class="carousel-item">
+                <img src="static/images/synth/0.jpg" alt="Image 2">
+              </div>
+              <div class="carousel-item">
+                <img src="static/images/synth/3.jpg" alt="Image 3">
+              </div>
+              <div class="carousel-item">
+                <img src="static/images/synth/4.jpg" alt="Image 4">
+              </div>
+              <div class="carousel-item">
+                <img src="static/images/synth/5.jpg" alt="Image 5">
+              </div>
+              <div class="carousel-item">
+                <img src="static/images/synth/6.jpg" alt="Image 6">
+              </div>
+              <div class="carousel-item">
+                <img src="static/images/synth/7.jpg" alt="Image 7">
+              </div>
+              <div class="carousel-item">
+                <img src="static/images/synth/8.jpg" alt="Image 8">
+              </div>
+              <div class="carousel-item">
+                <img src="static/images/synth/9.jpg" alt="Image 9">
+              </div>
+              <div class="carousel-item">
+                <img src="static/images/synth/10.jpg" alt="Image 10">
+              </div>
+              <div class="carousel-item">
+                <img src="static/images/synth/11.jpg" alt="Image 11">
+              </div>
+              <div class="carousel-item">
+                <img src="static/images/synth/12.jpg" alt="Image 12">
+              </div>
+              <div class="carousel-item">
+                <img src="static/images/synth/13.jpg" alt="Image 13">
+              </div>
+              <div class="carousel-item">
+                <img src="static/images/synth/14.jpg" alt="Image 14">
+              </div>
+              <div class="carousel-item">
+                <img src="static/images/synth/15.jpg" alt="Image 15">
+              </div>
+              <div class="carousel-item">
+                <img src="static/images/synth/16.jpg" alt="Image 16">
+              </div>
+              <div class="carousel-item">
+                <img src="static/images/synth/17.jpg" alt="Image 17">
+              </div>
+              <div class="carousel-item">
+                <img src="static/images/synth/18.jpg" alt="Image 18">
+              </div>
+              <div class="carousel-item">
+                <img src="static/images/synth/19.jpg" alt="Image 19">
+              </div>
+              <div class="carousel-item">
+                <img src="static/images/synth/20.jpg" alt="Image 20">
+              </div>
+              <div class="carousel-item">
+                <img src="static/images/synth/21.jpg" alt="Image 21">
+              </div>
+              <div class="carousel-item">
+                <img src="static/images/synth/22.jpg" alt="Image 22">
+              </div>
+              <div class="carousel-item">
+                <img src="static/images/synth/23.jpg" alt="Image 23">
+              </div>
+              <div class="carousel-item">
+                <img src="static/images/synth/24.jpg" alt="Image 24">
+              </div>
+              <div class="carousel-item">
+                <img src="static/images/synth/25.jpg" alt="Image 25">
+              </div>
+              <div class="carousel-item">
+                <img src="static/images/synth/26.jpg" alt="Image 26">
+              </div>
+              <div class="carousel-item">
+                <img src="static/images/synth/27.jpg" alt="Image 27">
+              </div>
+              <div class="carousel-item">
+                <img src="static/images/synth/28.jpg" alt="Image 28">
+              </div>
+              <div class="carousel-item">
+                <img src="static/images/synth/29.jpg" alt="Image 29">
+              </div>
+              <div class="carousel-item">
+                <img src="static/images/synth/30.jpg" alt="Image 30">
+              </div>
+              <div class="carousel-item">
+                <img src="static/images/synth/31.jpg" alt="Image 31">
+              </div>
+              <div class="carousel-item">
+                <img src="static/images/synth/32.jpg" alt="Image 32">
+              </div>
+              <div class="carousel-item">
+                <img src="static/images/synth/33.jpg" alt="Image 33">
+              </div>
+              <div class="carousel-item">
+                <img src="static/images/synth/34.jpg" alt="Image 34">
+              </div>
+              <div class="carousel-item">
+                <img src="static/images/synth/35.jpg" alt="Image 35">
+              </div>
+              <div class="carousel-item">
+                <img src="static/images/synth/36.jpg" alt="Image 36">
+              </div>
+              <div class="carousel-item">
+                <img src="static/images/synth/37.jpg" alt="Image 37">
+              </div>
+              <div class="carousel-item">
+                <img src="static/images/synth/38.jpg" alt="Image 38">
+              </div>
+              <div class="carousel-item">
+                <img src="static/images/synth/39.jpg" alt="Image 39">
+              </div>
+              <div class="carousel-item">
+                <img src="static/images/synth/40.jpg" alt="Image 40">
+              </div>
+              <div class="carousel-item">
+                <img src="static/images/synth/41.jpg" alt="Image 41">
+              </div>
+              <div class="carousel-item">
+                <img src="static/images/synth/42.jpg" alt="Image 42">
+              </div>
+              <div class="carousel-item">
+                <img src="static/images/synth/43.jpg" alt="Image 43">
+              </div>
+              <div class="carousel-item">
+                <img src="static/images/synth/44.jpg" alt="Image 44">
+              </div>
+              <div class="carousel-item">
+                <img src="static/images/synth/45.jpg" alt="Image 45">
+              </div>
+              <div class="carousel-item">
+                <img src="static/images/synth/46.jpg" alt="Image 46">
+              </div>
+              <div class="carousel-item">
+                <img src="static/images/synth/47.jpg" alt="Image 47">
+              </div>
+              <div class="carousel-item">
+                <img src="static/images/synth/48.jpg" alt="Image 48">
+              </div>
+              <div class="carousel-item">
+                <img src="static/images/synth/49.jpg" alt="Image 49">
+              </div>
+              <div class="carousel-item">
+                <img src="static/images/synth/50.jpg" alt="Image 50">
+              </div>
+              <div class="carousel-item">
+                <img src="static/images/synth/51.jpg" alt="Image 51">
+              </div>
+              <div class="carousel-item">
+                <img src="static/images/synth/52.jpg" alt="Image 52">
+              </div>
+              <div class="carousel-item">
+                <img src="static/images/synth/53.jpg" alt="Image 53">
+              </div>
+              <div class="carousel-item">
+                <img src="static/images/synth/54.jpg" alt="Image 54">
+              </div>
+              <div class="carousel-item">
+                <img src="static/images/synth/55.jpg" alt="Image 55">
+              </div>
+              <div class="carousel-item">
+                <img src="static/images/synth/56.jpg" alt="Image 56">
+              </div>
+              <div class="carousel-item">
+                <img src="static/images/synth/57.jpg" alt="Image 57">
+              </div>
+              <div class="carousel-item">
+                <img src="static/images/synth/58.jpg" alt="Image 58">
+              </div>
+              <div class="carousel-item">
+                <img src="static/images/synth/59.jpg" alt="Image 59">
+              </div>
+              <div class="carousel-item">
+                <img src="static/images/synth/2.jpg" alt="Image 60">
+              </div>
+            </div>
+
+        </div>
+        
+      </div>
+    </div>
+  </section>
+<!-- ======================= PartEdit Comparison Slider ======================= -->
+
+<section class="section">
+  <div class="container">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-full">
+        <div class="content is-3">
+          <h2 class="title is-3">Comparison With Existing Blending Strategies</h2>
+          <p>Below we showcase how we outpeform existing strategies, and that non binary blending performs worse:</p>      
+        </div>
+          
+         
+        <!-- <h2 class="title is-3">TEST Additional InstructPix2Pix Results</h2> -->
+        <div id="results-carousel" class="carousel results-carousel">
+            
+          <div class="carousel-item">
+            <img src="static/images/comp/1.jpg" alt="Image 1">
+          </div>
+          <div class="carousel-item">
+            <img src="static/images/comp/0.jpg" alt="Image 2">
+          </div>
+          <div class="carousel-item">
+            <img src="static/images/comp/3.jpg" alt="Image 3">
+          </div>
+          <div class="carousel-item">
+            <img src="static/images/comp/4.jpg" alt="Image 4">
+          </div>
+          <div class="carousel-item">
+            <img src="static/images/comp/5.jpg" alt="Image 5">
+          </div>
+          <div class="carousel-item">
+            <img src="static/images/comp/6.jpg" alt="Image 6">
+          </div>
+          <div class="carousel-item">
+            <img src="static/images/comp/7.jpg" alt="Image 7">
+          </div>
+          <div class="carousel-item">
+            <img src="static/images/comp/8.jpg" alt="Image 8">
+          </div>
+          <div class="carousel-item">
+            <img src="static/images/comp/9.jpg" alt="Image 9">
+          </div>
+          <div class="carousel-item">
+            <img src="static/images/comp/10.jpg" alt="Image 10">
+          </div>
+          <div class="carousel-item">
+            <img src="static/images/comp/11.jpg" alt="Image 11">
+          </div>
+          <div class="carousel-item">
+            <img src="static/images/comp/12.jpg" alt="Image 12">
+          </div>
+          <div class="carousel-item">
+            <img src="static/images/comp/13.jpg" alt="Image 13">
+          </div>
+          <div class="carousel-item">
+            <img src="static/images/comp/14.jpg" alt="Image 14">
+          </div>
+          <div class="carousel-item">
+            <img src="static/images/comp/15.jpg" alt="Image 15">
+          </div>
+          <div class="carousel-item">
+            <img src="static/images/comp/16.jpg" alt="Image 16">
+          </div>
+          <div class="carousel-item">
+            <img src="static/images/comp/17.jpg" alt="Image 17">
+          </div>
+          <div class="carousel-item">
+            <img src="static/images/comp/18.jpg" alt="Image 18">
+          </div>
+          <div class="carousel-item">
+            <img src="static/images/comp/19.jpg" alt="Image 19">
+          </div>
+          <div class="carousel-item">
+            <img src="static/images/comp/20.jpg" alt="Image 20">
+          </div>
+          <div class="carousel-item">
+            <img src="static/images/comp/21.jpg" alt="Image 21">
+          </div>
+          <div class="carousel-item">
+            <img src="static/images/comp/22.jpg" alt="Image 22">
+          </div>
+          <div class="carousel-item">
+            <img src="static/images/comp/23.jpg" alt="Image 23">
+          </div>
+          <div class="carousel-item">
+            <img src="static/images/comp/24.jpg" alt="Image 24">
+          </div>
+          <div class="carousel-item">
+            <img src="static/images/comp/25.jpg" alt="Image 25">
+          </div>
+          <div class="carousel-item">
+            <img src="static/images/comp/26.jpg" alt="Image 26">
+          </div>
+          <div class="carousel-item">
+            <img src="static/images/comp/27.jpg" alt="Image 27">
+          </div>
+          <div class="carousel-item">
+            <img src="static/images/comp/28.jpg" alt="Image 28">
+          </div>
+          <div class="carousel-item">
+            <img src="static/images/comp/29.jpg" alt="Image 29">
+          </div>
+          <div class="carousel-item">
+            <img src="static/images/comp/30.jpg" alt="Image 30">
+          </div>
+          <div class="carousel-item">
+            <img src="static/images/comp/31.jpg" alt="Image 31">
+          </div>
+          <div class="carousel-item">
+            <img src="static/images/comp/32.jpg" alt="Image 32">
+          </div>
+          <div class="carousel-item">
+            <img src="static/images/comp/33.jpg" alt="Image 33">
+          </div>
+          <div class="carousel-item">
+            <img src="static/images/comp/34.jpg" alt="Image 34">
+          </div>
+          <div class="carousel-item">
+            <img src="static/images/comp/35.jpg" alt="Image 35">
+          </div>
+          <div class="carousel-item">
+            <img src="static/images/comp/36.jpg" alt="Image 36">
+          </div>
+          <div class="carousel-item">
+            <img src="static/images/comp/37.jpg" alt="Image 37">
+          </div>
+          <div class="carousel-item">
+            <img src="static/images/comp/38.jpg" alt="Image 38">
+          </div>
+          <div class="carousel-item">
+            <img src="static/images/comp/39.jpg" alt="Image 39">
+          </div>
+          <div class="carousel-item">
+            <img src="static/images/comp/40.jpg" alt="Image 40">
+          </div>
+          <div class="carousel-item">
+            <img src="static/images/comp/41.jpg" alt="Image 41">
+          </div>
+          <div class="carousel-item">
+            <img src="static/images/comp/42.jpg" alt="Image 42">
+          </div>
+          <div class="carousel-item">
+            <img src="static/images/comp/43.jpg" alt="Image 43">
+          </div>
+          <div class="carousel-item">
+            <img src="static/images/comp/44.jpg" alt="Image 44">
+          </div>
+          <div class="carousel-item">
+            <img src="static/images/comp/45.jpg" alt="Image 45">
+          </div>
+          <div class="carousel-item">
+            <img src="static/images/comp/46.jpg" alt="Image 46">
+          </div>
+          <div class="carousel-item">
+            <img src="static/images/comp/47.jpg" alt="Image 47">
+          </div>
+          <div class="carousel-item">
+            <img src="static/images/comp/48.jpg" alt="Image 48">
+          </div>
+          <div class="carousel-item">
+            <img src="static/images/comp/49.jpg" alt="Image 49">
+          </div>
+          <div class="carousel-item">
+            <img src="static/images/comp/50.jpg" alt="Image 50">
+          </div>
+          <div class="carousel-item">
+            <img src="static/images/comp/51.jpg" alt="Image 51">
+          </div>
+          <div class="carousel-item">
+            <img src="static/images/comp/52.jpg" alt="Image 52">
+          </div>
+          <div class="carousel-item">
+            <img src="static/images/comp/53.jpg" alt="Image 53">
+          </div>
+          <div class="carousel-item">
+            <img src="static/images/comp/54.jpg" alt="Image 54">
+          </div>
+          <div class="carousel-item">
+            <img src="static/images/comp/55.jpg" alt="Image 55">
+          </div>
+          <div class="carousel-item">
+            <img src="static/images/comp/56.jpg" alt="Image 56">
+          </div>
+          <div class="carousel-item">
+            <img src="static/images/comp/57.jpg" alt="Image 57">
+          </div>
+          <div class="carousel-item">
+            <img src="static/images/comp/58.jpg" alt="Image 58">
+          </div>
+          <div class="carousel-item">
+            <img src="static/images/comp/59.jpg" alt="Image 59">
+          </div>
+          <div class="carousel-item">
+            <img src="static/images/comp/2.jpg" alt="Image 60">
+          </div>
+        </div>
+
+        <div class="list-container content has-text-justified">
+          <ol class="ordered-list" type="1">
+          <li><strong>Latent Blending (GT)</strong>: Uses ground-truth binary masks at each timestep.</li>
+          <li><strong>Latent Blending (Ours)</strong>: Uses non-binary masks at each timestep.</li>
+          <li><strong>Latent Blending (Otsu)</strong>: Uses Otsu-binarized masks at each timestep.</li>
+          <li><strong>PartEdit (Ours)</strong>: Uses non-binary masks <em>per layer</em> at each timestep.</li>
+          </ol>
+      </div>
+      <p class="note">
+          <strong>Note:</strong> <em>“Ours”</em> indicates usage of non-binary masks obtained from optimized tokens.
+  “Otsu” applies binarization to the same masks, while “GT” refers to ground-truth binary masks.
+      </p>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ======================= Figure  ======================= -->
+<section class="section make-black">
+    <div class="container">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-full">
+          <div class="content is-3">
+            <h2 class="title is-3">Qualitative Results - Masked</h2>
+            <p>Below we showcase how we outpeform existing masked strategies using ground-truth masks:</p>      
+          </div>
+            <div class="is-3">
+              
+                
+                <img src="static/figures/qualitative_masked.png" alt="Qualitative results on masked">
+                <!-- <h2 class="caption is-size-5 subtitle has-text-centered" style="margin-top:1rem;">
+                    MAYBE
+                </h2> -->
+            </div>
+          
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= Figure  ======================= -->
+<section class="section">
+    <div class="container">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-full">
+          <div class="content is-3">
+            <h2 class="title is-3">Qualitative Results - Real</h2>
+            <p>Below we showcase integration with existing inversion technique (Ledits++) with non binary blending compared to others:</p>      
+          </div>
+            <div class="is-3">
+                
+                <img src="static/figures/qualitative_real.png" alt="Qualitative results on real">
+                <!-- <h2 class="caption is-size-5 subtitle has-text-centered" style="margin-top:1rem;">
+                    MAYBE
+                </h2> -->
+            </div>
+          
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= Figure  ======================= -->
+  <!-- <h2 class="caption is-size-5 subtitle has-text-centered" style="margin-top:1rem;">
+                    MAYBE
+                </h2> -->
+  <!-- <section class="section make-black">
+    <div class="container">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-full">
+            <div class="is-3">
+                <h2 class="title is-3">Quantitative results obtained</h2>
+                <img src="static/figures/main_table.png" alt="Quantitative table">
+            </div>
+          
+          </div>
+        </div>
+      </div>
+    </div>
+  </section> -->
+
+
+<!-- ======================= Figure  ======================= -->
+<section class="section make-black">
+    <div class="container">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-fusll">
+            <div class="content is-3">
+              <h2 class="title is-3">Different Edits Same Regions</h2>
+              <p>Below we showcase different edits of the same regions, showcasing the using:</p>      
+            </div>
+            <div class="is-3">
+                
+                <img src="static/figures/multi_edit.png" alt="Different edits on the same region">
+                <!-- <h2 class="caption is-size-5 subtitle has-text-centered" style="margin-top:1rem;">
+                    MAYBE
+                </h2> -->
+            </div>
+          
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ======================= Figure  ======================= -->
+
+
+  <!-- <h2 class="caption is-size-5 subtitle has-text-centered" style="margin-top:1rem;">
+                    MAYBE
+                </h2> -->
+  <section class="section">
+    <div class="container">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-full">
+            <div class="content is-3">
+              <h2 class="title is-3">Multiple Part Editing</h2>
+              <p>Below we showcase same edit on multiple parts (torso and head in this example):</p>      
+            </div>
+            <div class="is-3">
+                
+                <img src="static/figures/double_edit.png" alt="Multiple part edits extension">
+                
+            </div>
+          
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+
+<!-- ======================= BibTeX ======================= -->
+<section class="section" id="BibTeX">
+  <div class="container content">
+    <div class="columns is-centered">
+      <div class="column is-two-thirds has-text-justified">
+        <h2 >BibTeX (PartEdit)</h2>
+<pre><code>@InProceedings{TBD}
+</code></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+<!-- ======================= Acknowledgements ======================= -->
+
+<!-- <section class="section" id="acknowledgements">
+  <div class="container content">
+    <div class="columns is-centered">
+      <div class="column is-two-thirds has-text-justified">
+        <h2 class="title">Acknowledgements</h2>
+        <p>
+            TODO
+        </p>
+      </div>
+    </div>
+  </div>
+</section> -->
+
+<!-- ======================= Footer ======================= -->
+<footer class="footer">
+  <div class="container">
+    <div class="columns is-centered">
+      <div class="column is-8">
+        <div class="content has-text-centered">
+          <p>
+            Website adapted from the following <a href="http://nerfies.github.io">template</a> 
+          and further extended using the <a href="https://bulma.io/">Bulma</a> framework.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ======================= Carousel Initialization ======================= -->
+<script>
+  // Comparison carousel
+  bulmaCarousel.attach('#results-carousel', {
+    slidesToScroll: 1,
+    slidesToShow: 1,
+    loop: true,
+    pagination: false,
+    autoplay: false,
+    pauseOnHover: true
+  });
+
+  // Synthetic results carousel
+  bulmaCarousel.attach('#synthetic-carousel', {
+    slidesToScroll: 1,
+    slidesToShow: 1,
+    loop: true,
+    pagination: false,
+    autoplay: false,
+    pauseOnHover: true
+  });
+</script>
+
+</body>
+</html>
